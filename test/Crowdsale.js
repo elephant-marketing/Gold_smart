@@ -15,7 +15,6 @@ contract('Crowdsale.Crowdsale', function(accounts) {
 
 		const crowdsale = await Crowdsale.new(
 			rate,
-			hardcap,
 			wallet,
 			startDate,
 			endDate,
@@ -23,15 +22,14 @@ contract('Crowdsale.Crowdsale', function(accounts) {
 			stageBonus
 		)
 
+		await crowdsale.setHardcap(hardcap)
 		const rateDeployed = (await crowdsale.rate()).toNumber()
-		const hardcapDeployed = (await crowdsale.hardcap()).toNumber() / 1000000000000000000
 		const walletDeployed = await crowdsale.wallet()
 		const startDateDeployed = (await crowdsale.startDate()).toNumber()
 		const endDateDeployed = (await crowdsale.endDate()).toNumber()
 		const stageBonusDeployed = await crowdsale.stageBonus()
 
 		assert.equal(rate, rateDeployed, 'rate неравен')
-		assert.equal(hardcap, hardcapDeployed, 'hardcap неравен')
 		assert.equal(wallet, walletDeployed, 'wallet неравен')
 		assert.equal(startDate, startDateDeployed, 'startDate неравен')
 		assert.equal(endDate, endDateDeployed, 'endDate неравен')
@@ -43,7 +41,6 @@ contract('Crowdsale.Crowdsale', function(accounts) {
 
 		const crowdsale = await Crowdsale.new(
 			rate,
-			hardcap,
 			wallet,
 			startDate,
 			endDate,
@@ -67,9 +64,10 @@ contract('Crowdsale.buyTokens', function(accounts) {
 		const buyer = accounts[2]
 		const value = await web3.toWei('1', 'ether')
 
-		const crowdsale = await Crowdsale.new(rate, hardcap, wallet, startDate, endDate, isPreICO, stageBonus)
+		const crowdsale = await Crowdsale.new(rate, wallet, startDate, endDate, isPreICO, stageBonus)
 		const crowdsaleAddress = await crowdsale.address
 
+		await crowdsale.setHardcap(hardcap)
 		await crowdsale.setToken(tokenAddress)
 		await crowdsale.setETHUSD(ETHUSD)
 		await token.addSaleAgent(crowdsaleAddress)
@@ -100,9 +98,10 @@ contract('Crowdsale.buyTokens', function(accounts) {
 		const buyer = accounts[4]
 		const value = await web3.toWei('1', 'ether')
 
-		const crowdsale = await Crowdsale.new(rate, hardcap, wallet, startDate, endDate, !isPreICO, stageBonus)
+		const crowdsale = await Crowdsale.new(rate, wallet, startDate, endDate, !isPreICO, stageBonus)
 		const crowdsaleAddress = await crowdsale.address
 
+		await crowdsale.setHardcap(hardcap)
 		await crowdsale.setToken(tokenAddress)
 		await crowdsale.setETHUSD(ETHUSD)
 		await token.addSaleAgent(crowdsaleAddress)
@@ -130,9 +129,10 @@ contract('Crowdsale.buyTokens', function(accounts) {
 		const value5 = await web3.toWei('0.2', 'ether')
 		const value3 = await web3.toWei('0.05', 'ether')
 
-		const crowdsale = await Crowdsale.new(rate, hardcap, wallet, startDate, endDate, isPreICO, stageBonus)
+		const crowdsale = await Crowdsale.new(rate, wallet, startDate, endDate, isPreICO, stageBonus)
 		const crowdsaleAddress = await crowdsale.address
 
+		await crowdsale.setHardcap(hardcap)
 		await crowdsale.setToken(tokenAddress)
 		await crowdsale.setETHUSD(ETHUSD)
 		await token.addSaleAgent(crowdsaleAddress)
@@ -177,9 +177,11 @@ contract('Crowdsale.buyTokens', function(accounts) {
 		const buyer = accounts[4]
 		const value = await web3.toWei('30', 'ether')
 
-		const crowdsale = await Crowdsale.new(rate, hardcap, wallet, startDate, endDate, isPreICO, stageBonus)
+		const crowdsale = await Crowdsale.new(rate, wallet, startDate, endDate, isPreICO, stageBonus)
 		const crowdsaleAddress = await crowdsale.address
 
+		await crowdsale.setHardcap(hardcap)
+		await crowdsale.setHardcap(hardcap)
 		await crowdsale.setToken(tokenAddress)
 		await crowdsale.setETHUSD(ETHUSD)
 		await token.addSaleAgent(crowdsaleAddress)
@@ -205,9 +207,10 @@ contract('Crowdsale.buyTokens', function(accounts) {
 		const beneficiary = '0x0'
 		const value = await web3.toWei('1', 'ether')
 
-		const crowdsale = await Crowdsale.new(rate, hardcap, wallet, startDate, endDate, isPreICO, stageBonus)
+		const crowdsale = await Crowdsale.new(rate, wallet, startDate, endDate, isPreICO, stageBonus)
 		const crowdsaleAddress = await crowdsale.address
 
+		await crowdsale.setHardcap(hardcap)
 		await crowdsale.setToken(tokenAddress)
 		await crowdsale.setETHUSD(ETHUSD)
 		await token.addSaleAgent(crowdsaleAddress)
@@ -228,9 +231,10 @@ contract('Crowdsale.buyTokens', function(accounts) {
 		const buyer = accounts[4]
 		const value = await web3.toWei('1', 'ether')
 
-		const crowdsale = await Crowdsale.new(rate, hardcap, wallet, startDate, endDate, !isPreICO, stageBonus)
+		const crowdsale = await Crowdsale.new(rate, wallet, startDate, endDate, !isPreICO, stageBonus)
 		const crowdsaleAddress = await crowdsale.address
 
+		await crowdsale.setHardcap(hardcap)
 		await crowdsale.setToken(tokenAddress)
 		await crowdsale.setETHUSD(ETHUSD)
 		await token.addSaleAgent(crowdsaleAddress)
@@ -251,7 +255,6 @@ contract('Crowdsale.setStartDate, Crowdsale.setEndDate', function(accounts) {
 		const wallet = accounts[1]
 		const crowdsale = await Crowdsale.new(
 			rate,
-			hardcap,
 			wallet,
 			startDate,
 			endDate,
@@ -262,7 +265,7 @@ contract('Crowdsale.setStartDate, Crowdsale.setEndDate', function(accounts) {
 		const sDate = Math.floor(Date.now()/1000)
 		const eDate = Math.floor(Date.now()/1000) + 3600
 
-
+		await crowdsale.setHardcap(hardcap)
 		await crowdsale.setStartDate(sDate)
 		await crowdsale.setEndDate(eDate)
 
@@ -281,7 +284,6 @@ contract('Crowdsale.setETHUSD', function(accounts) {
 		const wallet = accounts[1]
 		const crowdsale = await Crowdsale.new(
 			rate,
-			hardcap,
 			wallet,
 			startDate,
 			endDate,
@@ -291,6 +293,7 @@ contract('Crowdsale.setETHUSD', function(accounts) {
 
 		const ETHUSD = 100
 
+		await crowdsale.setHardcap(hardcap)
 		await crowdsale.setETHUSD(ETHUSD)
 
 		const ETHUSDSet = (await crowdsale.ETHUSD()).toNumber()
@@ -311,7 +314,6 @@ contract('Crowdsale.addToWhitelist, Crowdsale.addManyToWhitelist, Crowdsale.remo
 
 		const crowdsale = await Crowdsale.new(
 			rate,
-			hardcap,
 			wallet,
 			startDate,
 			endDate,
@@ -319,6 +321,7 @@ contract('Crowdsale.addToWhitelist, Crowdsale.addManyToWhitelist, Crowdsale.remo
 			stageBonus
 		)
 
+		await crowdsale.setHardcap(hardcap)
 		await crowdsale.addToWhitelist(whitelisted1)
 		await crowdsale.addManyToWhitelist([whitelisted2, whitelisted3])
 		await crowdsale.removeFromWhitelist(whitelisted3)
@@ -340,7 +343,6 @@ contract('Crowdsale.hasClosed()', function(accounts) {
 
 		const crowdsale = await Crowdsale.new(
 			rate,
-			hardcap,
 			wallet,
 			sDate,
 			eDate,
@@ -365,7 +367,6 @@ contract('Crowdsale.finalize()', function(accounts) {
 
 		const crowdsale = await Crowdsale.new(
 			rate,
-			hardcap,
 			wallet,
 			sDate,
 			eDate,
@@ -373,6 +374,7 @@ contract('Crowdsale.finalize()', function(accounts) {
 			stageBonus
 		)
 
+		await crowdsale.setHardcap(hardcap)
 		const isFinalizedStart = await crowdsale.isFinalized()
 		await crowdsale.finalize()
 		const isFinalizedEnd = await crowdsale.isFinalized()

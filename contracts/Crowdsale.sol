@@ -93,7 +93,6 @@ contract Crowdsale is Ownable {
 
   function Crowdsale(
     uint256 _rate, 
-    uint256 _hardcap, 
     address _wallet, 
     uint256 _startDate, 
     uint256 _endDate,
@@ -101,13 +100,11 @@ contract Crowdsale is Ownable {
     uint8 _stageBonus
   ) public {
     require(_rate > 0);
-    require(_hardcap > 0);
     require(_wallet != address(0));
     require(_startDate + 120 >= now);
     require(_endDate >= _startDate);
 
     rate = _rate;
-    hardcap = _hardcap * 1 ether;
     wallet = _wallet;
     startDate = _startDate;
     endDate = _endDate;
@@ -125,6 +122,12 @@ contract Crowdsale is Ownable {
     token = _token;
   }
   
+  // Установить hardcap в ether
+  function setHardcap (uint256 _hardcap) public onlyOwner {
+    hardcap = _hardcap * 1 ether;
+  }
+  
+
   // Установить дату начала
   function setStartDate (uint256 _startDate) public onlyOwner {
     require(_startDate < endDate);
