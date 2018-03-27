@@ -302,6 +302,26 @@ contract('Crowdsale.setETHUSD', function(accounts) {
 	})
 })
 
+contract ('Crowdsale.setHardcap', function(accounts) {
+	it('Должен сеттить hardcap', async () => {
+		const wallet = accounts[1]
+		const crowdsale = await Crowdsale.new(
+			rate,
+			wallet,
+			startDate,
+			endDate,
+			true,
+			stageBonus
+		)
+
+		await crowdsale.setHardcap(hardcap)
+
+		const hardcapSet = (await crowdsale.hardcap()).toNumber()
+
+		assert.equal(hardcapSet, hardcap * 1000000000000000000, 'hardcap не сеттится')
+	})
+})
+
 contract('Crowdsale.addToWhitelist, Crowdsale.addManyToWhitelist, Crowdsale.removeFromWhitelist', function(accounts) {
 
 	it('Whitelist должен правильно редактироваться', async () => {
