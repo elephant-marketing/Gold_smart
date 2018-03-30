@@ -372,7 +372,6 @@ contract('Crowdsale.hasClosed()', function(accounts) {
 
 		const hasClosed = await crowdsale.hasClosed()
 
-		console.log(hasClosed)
 		assert(hasClosed, 'не закрывается по истечении времени')
 	})
 })

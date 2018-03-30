@@ -64,10 +64,10 @@ contract Crowdsale is Ownable {
   // Amount of wei raised
   uint256 public weiRaised;
 
-  // Потолок привлечения средств в ходе ICO в wei
+  // Потолок привлечения средств в ходе ICO в $
   uint256 public hardcap;
 
-  // Цена ETH в центах
+  // Цена ETH в $
   uint256 public ETHUSD;
 
   // Дата начала
@@ -97,18 +97,21 @@ contract Crowdsale is Ownable {
     uint256 _startDate, 
     uint256 _endDate,
     bool _isPreICO, 
-    uint8 _stageBonus
+    uint8 _stageBonus,
+    uint256 _hardcap
   ) public {
     require(_rate > 0);
     require(_wallet != address(0));
     require(_startDate + 120 >= now);
     require(_endDate >= _startDate);
+    require(_hardcap > 0);
 
     rate = _rate;
     wallet = _wallet;
     startDate = _startDate;
     endDate = _endDate;
     isPreICO = _isPreICO;
+    hardcap = _hardcap;
 
     if(isPreICO){
       stageBonus = 30;
@@ -117,14 +120,20 @@ contract Crowdsale is Ownable {
     }
   }
 
+  // Установить стоимость токена
+  function setRate (uint16 _rate) public onlyOwner {
+    require(_rate > 0);
+    rate = _rate;
+  }
+
   // Установить торгуемй токен
   function setToken (ERC20 _token) public onlyOwner {
     token = _token;
   }
   
-  // Установить hardcap в ether
+  // Установить hardcap в $
   function setHardcap (uint256 _hardcap) public onlyOwner {
-    hardcap = _hardcap * 1 ether;
+    hardcap = _hardcap;
   }
   
 
@@ -213,7 +222,7 @@ contract Crowdsale is Ownable {
     require(!isFinalized);
     require(_beneficiary != address(0));
     require(_weiAmount != 0);
-    require(weiRaised.add(_weiAmount) <= hardcap);
+    require(weiRaised.add(_weiAmount).mul(ETHUSD).div(10**18) <= hardcap);
     require(!isPreICO || (isPreICO && whitelist[_beneficiary]));
   }
 
@@ -225,13 +234,13 @@ contract Crowdsale is Ownable {
 
     // Считаем бонусы за объем инвестиций, если это не этап PreICO
     if(!isPreICO){
-      if(usdAmount >= 20000000){
+      if(usdAmount >= 200000){
         tokenAmount = tokenAmount.add(baseTokenAmount.mul(10).div(100));
-      } else if(usdAmount >= 5000000){
+      } else if(usdAmount >= 50000){
         tokenAmount = tokenAmount.add(baseTokenAmount.mul(7).div(100));
-      } else if(usdAmount >= 2000000){
+      } else if(usdAmount >= 20000){
         tokenAmount = tokenAmount.add(baseTokenAmount.mul(5).div(100));
-      } else if(usdAmount >= 500000){
+      } else if(usdAmount >= 5000){
         tokenAmount = tokenAmount.add(baseTokenAmount.mul(3).div(100));
       }
     }
