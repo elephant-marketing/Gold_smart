@@ -48,7 +48,7 @@ contract Crowdsale is Ownable {
   using SafeMath for uint256;
 
   modifier onlyWhileOpen {
-      require(now >= (startDate - 120) && now <= endDate);
+      require(now >= startDate && now < endDate);
       _;
   }
 
@@ -97,12 +97,10 @@ contract Crowdsale is Ownable {
     uint256 _startDate, 
     uint256 _endDate,
     bool _isPreICO, 
-    uint8 _stageBonus,
-    uint256 _hardcap
+    uint256 _hardcap,
+    uint8 _stageBonus
   ) public {
     require(_rate > 0);
-    require(_wallet != address(0));
-    require(_startDate + 120 >= now);
     require(_endDate >= _startDate);
     require(_hardcap > 0);
 
@@ -118,6 +116,11 @@ contract Crowdsale is Ownable {
     }else{
       stageBonus = _stageBonus;
     }
+  }
+
+  // Установить кошелек для сбора средств
+  function setWallet (uint16 _wallet) public onlyOwner {
+    wallet = _wallet;
   }
 
   // Установить стоимость токена
