@@ -1,6 +1,5 @@
 pragma solidity ^0.4.21;
 
-
 library SafeMath {
     function mul(uint256 a, uint256 b) internal pure returns (uint256) {
         if (a == 0) {
@@ -25,12 +24,10 @@ library SafeMath {
     }
 }
 
-
 interface ERC20 {
     function transfer (address _beneficiary, uint256 _tokenAmount) external returns (bool);
     function sendToSaleAgent (address _saleAgent, uint256 _value) external;
 }
-
 
 contract Ownable {
     address public owner;
@@ -42,7 +39,6 @@ contract Ownable {
         _;
     }
 }
-
 
 contract Crowdsale is Ownable {
     using SafeMath for uint256;
@@ -126,7 +122,6 @@ contract Crowdsale is Ownable {
         _;
     }
 
-
     // Установить кошелек для сбора средств
     function setWallet (uint16 _wallet) public onlyOwner {
         wallet = _wallet;
@@ -147,7 +142,6 @@ contract Crowdsale is Ownable {
     function setHardcap (uint256 _hardcap) public onlyOwner {
         hardcap = _hardcap;
     }
-
 
     // Установить дату начала
     function setStartDate (uint256 _startDate) public onlyOwner {
@@ -170,7 +164,6 @@ contract Crowdsale is Ownable {
     function setBackendOperator(address newOperator) public onlyOwner {
         backendOperator = newOperator;
     }
-
 
     // Получить токены для продажи
     function getTokens (uint256 _amount) public onlyOwner {
