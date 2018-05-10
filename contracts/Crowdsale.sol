@@ -1,4 +1,4 @@
-pragma solidity ^0.4.21;
+pragma solidity ^0.4.23;
 
 library SafeMath {
     function mul(uint256 a, uint256 b) internal pure returns (uint256) {
@@ -31,9 +31,11 @@ interface ERC20 {
 
 contract Ownable {
     address public owner;
-    function Ownable() public {
+
+    constructor() public {
         owner = msg.sender;
     }
+
     modifier onlyOwner() {
         require(msg.sender == owner);
         _;
@@ -90,7 +92,7 @@ contract Crowdsale is Ownable {
     event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
     event Finalized();
 
-    function Crowdsale(
+    constructor(
         uint256 _rate,
         address _wallet,
         uint256 _startDate,
