@@ -1,6 +1,5 @@
 pragma solidity ^0.4.21;
 
-
 library SafeMath {
     function mul(uint256 a, uint256 b) internal pure returns (uint256) {
         if (a == 0) {
@@ -61,7 +60,7 @@ contract TokenERC20 is Ownable {
     ) public
     {
         uint256 localInitialSupply = _initialSupply.mul(10 ** uint256(decimals)); // Подсчитываем общее количество токенов
-        
+
         initialSupply = localInitialSupply;
         totalSupply = localInitialSupply; // Записываем общее количество выпускаемых токенов
 
@@ -81,7 +80,7 @@ contract TokenERC20 is Ownable {
         uint256 previousBalances = balanceOf[_from].add(balanceOf[_to]);
         balanceOf[_from] = balanceOf[_from].sub(_value);
         balanceOf[_to] = balanceOf[_to].add(_value);
-        Transfer(_from, _to, _value);
+        emit Transfer(_from, _to, _value);
         assert(balanceOf[_from].add(balanceOf[_to]) == previousBalances);
     }
 
@@ -94,7 +93,7 @@ contract TokenERC20 is Ownable {
         require(_value <= allowed[_from][msg.sender]);
 
         allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
-         _transfer(_from, _to, _value);
+        _transfer(_from, _to, _value);
         return true;
     }
 
@@ -104,11 +103,10 @@ contract TokenERC20 is Ownable {
         balanceOf[this] = balanceOf[this].sub(_value);
         balanceOf[_saleAgent] = balanceOf[_saleAgent].add(_value);
     }
-    
 
     function approve(address _spender, uint256 _value) public returns (bool) {
         allowed[msg.sender][_spender] = _value;
-        Approval(msg.sender, _spender, _value);
+        emit Approval(msg.sender, _spender, _value);
         return true;
     }
 
@@ -118,21 +116,20 @@ contract TokenERC20 is Ownable {
 
     function increaseApproval(address _spender, uint _addedValue) public returns (bool) {
         allowed[msg.sender][_spender] = allowed[msg.sender][_spender].add(_addedValue);
-        Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
+        emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
         return true;
     }
 
     function decreaseApproval(address _spender, uint _subtractedValue) public returns (bool) {
         uint oldValue = allowed[msg.sender][_spender];
         if (_subtractedValue > oldValue) {
-          allowed[msg.sender][_spender] = 0;
+            allowed[msg.sender][_spender] = 0;
         } else {
-          allowed[msg.sender][_spender] = oldValue.sub(_subtractedValue);
+            allowed[msg.sender][_spender] = oldValue.sub(_subtractedValue);
         }
-        Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
+        emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
         return true;
     }
-
 
     function burn(uint256 _value) public returns (bool) {
         require(balanceOf[msg.sender] >= _value);   // Проверяем, достаточно ли средств у сжигателя
@@ -140,8 +137,8 @@ contract TokenERC20 is Ownable {
         address burner = msg.sender;
         balanceOf[burner] = balanceOf[burner].sub(_value);  // Списываем с баланса сжигателя
         totalSupply = totalSupply.sub(_value);  // Обновляем общее количество токенов
-        Burn(burner, _value);
-        Transfer(burner, address(0x0), _value);
+        emit Burn(burner, _value);
+        emit Transfer(burner, address(0x0), _value);
         return true;
     }
 
@@ -162,5 +159,4 @@ contract TokenERC20 is Ownable {
 
 contract Token is TokenERC20 {
     function Token() public TokenERC20(100000000, "SomeCrowdsaleToken", "SCT") {}
-
 }
