@@ -1,31 +1,42 @@
 pragma solidity ^0.4.23;
 
 library SafeMath {
-    function mul(uint256 a, uint256 b) internal pure returns (uint256) {
+
+    function mul(uint256 a, uint256 b) internal pure returns (uint256 c) {
         if (a == 0) {
             return 0;
         }
-        uint256 c = a * b;
+        c = a * b;
         assert(c / a == b);
         return c;
     }
+
     function div(uint256 a, uint256 b) internal pure returns (uint256) {
-        uint256 c = a / b;
-        return c;
+        return a / b;
     }
+
     function sub(uint256 a, uint256 b) internal pure returns (uint256) {
         assert(b <= a);
         return a - b;
     }
-    function add(uint256 a, uint256 b) internal pure returns (uint256) {
-        uint256 c = a + b;
+
+    function add(uint256 a, uint256 b) internal pure returns (uint256 c) {
+        c = a + b;
         assert(c >= a);
         return c;
     }
 }
 
+/**
+ * @title Ownable
+ */
 contract Ownable {
     address public owner;
+
+    event OwnershipTransferred(
+        address indexed previousOwner,
+        address indexed newOwner
+    );
 
     constructor() public {
         owner = msg.sender;
@@ -35,75 +46,110 @@ contract Ownable {
         require(msg.sender == owner);
         _;
     }
+
+    function transferOwnership(address newOwner) public onlyOwner {
+        require(newOwner != address(0));
+        emit OwnershipTransferred(owner, newOwner);
+        owner = newOwner;
+    }
 }
 
-contract TokenERC20 is Ownable {
-    using SafeMath for uint;
-    string public name;
-    string public symbol;
-    uint8 public decimals = 18;
-    address public owner;
-    uint256 public initialSupply;
-    uint256 public totalSupply;
-    bool public isEnabled;
+contract Pausable is Ownable {
 
-    mapping (address => bool) public saleAgents;
-    mapping (address => mapping (address => uint256)) internal allowed;
-    mapping (address => uint256) public balanceOf;
+    event Pause();
+    event Unpause();
 
-    event Transfer(address indexed from, address indexed to, uint256 value);
-    event Approval(address indexed owner, address indexed spender, uint256 value);
-    event Burn(address indexed from, uint256 value);
+    bool public paused = false;
 
-    constructor(
-        uint256 _initialSupply,
-        string _tokenName,
-        string _tokenSymbol
-    ) public
-    {
-        uint256 localInitialSupply = _initialSupply.mul(10 ** uint256(decimals)); // Подсчитываем общее количество токенов
-
-        initialSupply = localInitialSupply;
-        totalSupply = localInitialSupply; // Записываем общее количество выпускаемых токенов
-
-        balanceOf[this] = localInitialSupply.div(3).mul(2); // Записываем две трети токенов на адрес текущего контракта токена
-        balanceOf[msg.sender] = localInitialSupply.div(3); // Треть токенов переводим создателю контракта
-        name = _tokenName; // Записываем название токена
-        symbol = _tokenSymbol; // Записываем символ токена
-        owner = msg.sender; // Делаем создателя контракта владельцем
+    modifier whenNotPaused() {
+        require(!paused);
+        _;
     }
 
-    function _transfer(address _from, address _to, uint256 _value) internal {
-        require(_to != 0x0);
-        require(_value <= balanceOf[_from]);
-        require(balanceOf[_to].add(_value) > balanceOf[_to]);
-        require(isEnabled || saleAgents[msg.sender]);
+    modifier whenPaused() {
+        require(paused);
+        _;
+    }
 
-        uint256 previousBalances = balanceOf[_from].add(balanceOf[_to]);
-        balanceOf[_from] = balanceOf[_from].sub(_value);
-        balanceOf[_to] = balanceOf[_to].add(_value);
-        emit Transfer(_from, _to, _value);
-        assert(balanceOf[_from].add(balanceOf[_to]) == previousBalances);
+    function pause() onlyOwner whenNotPaused public {
+        paused = true;
+        emit Pause();
+    }
+
+    function unpause() onlyOwner whenPaused public {
+        paused = false;
+        emit Unpause();
+    }
+}
+
+contract ERC20Basic {
+    function totalSupply() public view returns (uint256);
+    function balanceOf(address who) public view returns (uint256);
+    function transfer(address to, uint256 value) public returns (bool);
+    event Transfer(address indexed from, address indexed to, uint256 value);
+}
+
+contract BasicToken is ERC20Basic {
+    using SafeMath for uint256;
+
+    mapping(address => uint256) balances;
+
+    uint256 totalSupply_;
+
+    function totalSupply() public view returns (uint256) {
+        return totalSupply_;
     }
 
     function transfer(address _to, uint256 _value) public returns (bool) {
-        _transfer(msg.sender, _to, _value);
+        require(_to != address(0));
+        require(_value <= balances[msg.sender]);
+
+        balances[msg.sender] = balances[msg.sender].sub(_value);
+        balances[_to] = balances[_to].add(_value);
+        emit Transfer(msg.sender, _to, _value);
         return true;
     }
 
-    function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
+    function balanceOf(address _owner) public view returns (uint256) {
+        return balances[_owner];
+    }
+}
+
+contract ERC20 is ERC20Basic {
+    function allowance(address owner, address spender)
+    public view returns (uint256);
+
+    function transferFrom(address from, address to, uint256 value)
+    public returns (bool);
+
+    function approve(address spender, uint256 value) public returns (bool);
+    event Approval(
+        address indexed owner,
+        address indexed spender,
+        uint256 value
+    );
+}
+
+contract StandardToken is ERC20, BasicToken {
+
+    mapping (address => mapping (address => uint256)) internal allowed;
+
+    function transferFrom(
+        address _from,
+        address _to,
+        uint256 _value
+    )
+    public returns (bool)
+    {
+        require(_to != address(0));
+        require(_value <= balances[_from]);
         require(_value <= allowed[_from][msg.sender]);
 
+        balances[_from] = balances[_from].sub(_value);
+        balances[_to] = balances[_to].add(_value);
         allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
-        _transfer(_from, _to, _value);
+        emit Transfer(_from, _to, _value);
         return true;
-    }
-
-    function sendToSaleAgent (address _saleAgent, uint256 _value) public {
-        require(saleAgents[_saleAgent]);
-        require(_value <= balanceOf[this]);
-        balanceOf[this] = balanceOf[this].sub(_value);
-        balanceOf[_saleAgent] = balanceOf[_saleAgent].add(_value);
     }
 
     function approve(address _spender, uint256 _value) public returns (bool) {
@@ -112,17 +158,34 @@ contract TokenERC20 is Ownable {
         return true;
     }
 
-    function allowance(address _owner, address _spender) public view returns (uint256) {
+    function allowance(
+        address _owner,
+        address _spender
+    )
+    public view returns (uint256)
+    {
         return allowed[_owner][_spender];
     }
 
-    function increaseApproval(address _spender, uint _addedValue) public returns (bool) {
-        allowed[msg.sender][_spender] = allowed[msg.sender][_spender].add(_addedValue);
+    function increaseApproval(
+        address _spender,
+        uint _addedValue
+    )
+    public returns (bool)
+    {
+        allowed[msg.sender][_spender] = (
+        allowed[msg.sender][_spender].add(_addedValue));
         emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
         return true;
     }
 
-    function decreaseApproval(address _spender, uint _subtractedValue) public returns (bool) {
+    function decreaseApproval(
+        address _spender,
+        uint _subtractedValue
+    )
+    public
+    returns (bool)
+    {
         uint oldValue = allowed[msg.sender][_spender];
         if (_subtractedValue > oldValue) {
             allowed[msg.sender][_spender] = 0;
@@ -132,33 +195,76 @@ contract TokenERC20 is Ownable {
         emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
         return true;
     }
+}
 
-    function burn(uint256 _value) public returns (bool) {
-        require(balanceOf[msg.sender] >= _value);   // Проверяем, достаточно ли средств у сжигателя
+contract BurnableToken is BasicToken {
 
-        address burner = msg.sender;
-        balanceOf[burner] = balanceOf[burner].sub(_value);  // Списываем с баланса сжигателя
-        totalSupply = totalSupply.sub(_value);  // Обновляем общее количество токенов
-        emit Burn(burner, _value);
-        emit Transfer(burner, address(0x0), _value);
-        return true;
+    event Burn(address indexed burner, uint256 value);
+
+    function burn(uint256 _value) public {
+        _burn(msg.sender, _value);
     }
 
-    function addSaleAgent (address _saleAgent) public onlyOwner {
-        saleAgents[_saleAgent] = true;
-        allowed[this][_saleAgent] = totalSupply;
-    }
+    function _burn(address _who, uint256 _value) internal {
+        require(_value <= balances[_who]);
 
-    function disable () public onlyOwner {
-        require(isEnabled);
-        isEnabled = false;
-    }
-    function enable () public onlyOwner {
-        require(!isEnabled);
-        isEnabled = true;
+        balances[_who] = balances[_who].sub(_value);
+        totalSupply_ = totalSupply_.sub(_value);
+        emit Burn(_who, _value);
+        emit Transfer(_who, address(0), _value);
     }
 }
 
-contract Token is TokenERC20 {
-    constructor() public TokenERC20(100000000, "Innovative Minerals", "INM") {}
+contract MoviesToken is StandardToken, BurnableToken, Pausable {
+
+    using SafeMath for uint256;
+
+    string  public name = "Innovative Minerals";
+    string  public symbol = "INM";
+    uint256 constant public decimals = 18;
+    uint256 constant dec = 10**decimals;
+    uint256 public initialSupply = 100000000*dec;
+    uint256 public availableSupply;
+    address public crowdsaleAddress;
+
+    modifier onlyICO() {
+        require(msg.sender == crowdsaleAddress);
+        _;
+    }
+
+    constructor() public {
+        totalSupply_ = totalSupply_.add(initialSupply);
+        balances[owner] = balances[owner].add(initialSupply);
+        availableSupply = totalSupply_;
+        emit Transfer(address(0x0), this, initialSupply);
+    }
+
+    function setSaleAddress(address _saleaddress) public onlyOwner{
+        crowdsaleAddress = _saleaddress;
+    }
+
+    function transferFromICO(address _to, uint256 _value) public onlyICO returns(bool) {
+        require(_to != address(0x0));
+        return super.transfer(_to, _value);
+    }
+
+    function transfer(address _to, uint256 _value) public whenNotPaused returns (bool) {
+        return super.transfer(_to, _value);
+    }
+
+    function transferFrom(address _from, address _to, uint256 _value) public whenNotPaused returns (bool) {
+        return super.transferFrom(_from, _to, _value);
+    }
+
+    function approve(address _spender, uint256 _value) public whenNotPaused returns (bool) {
+        return super.approve(_spender, _value);
+    }
+
+    function increaseApproval(address _spender, uint _addedValue) public whenNotPaused returns (bool success) {
+        return super.increaseApproval(_spender, _addedValue);
+    }
+
+    function decreaseApproval(address _spender, uint _subtractedValue) public whenNotPaused returns (bool success) {
+        return super.decreaseApproval(_spender, _subtractedValue);
+    }
 }
