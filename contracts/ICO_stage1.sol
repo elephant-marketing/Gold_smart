@@ -70,7 +70,6 @@ contract OneStageMainSale is Ownable {
     mapping(address => uint256) public investedEther;
 
     uint256 public start1StageSale = 1539561601; // Monday, 15-Oct-18 00:00:01 UTC
-
     uint256 public end1StageSale = 1542326399; // Thursday, 15-Nov-18 23:59:59 UTC
 
     uint256 public investors; // общее количество инвесторов
@@ -97,7 +96,7 @@ contract OneStageMainSale is Ownable {
     constructor(ERC20 _token, uint256 usdETH) public {
         token = _token;
         dollarPrice = usdETH;
-        buyPrice = (1e17/dollarPrice)*26; // 2.10 usd
+        buyPrice = (1e17/dollarPrice)*26; // 2.60 usd
     }
 
     // изменение даты начала предварительной распродажи
@@ -118,7 +117,7 @@ contract OneStageMainSale is Ownable {
     // Изменение курса доллра к эфиру
     function setBuyPrice(uint256 _dollar) public onlyOwner {
         dollarPrice = _dollar;
-        buyPrice = (1e17/dollarPrice)*26; // 2.10 usd
+        buyPrice = (1e17/dollarPrice)*26; // 2.60 usd
         emit UpdateDollar(now, dollarPrice);
     }
 
@@ -185,13 +184,13 @@ contract OneStageMainSale is Ownable {
     }
 
     function bonusSum(uint256 _amount) pure private returns(uint256) {
-        if (_amount > 95238*1e18) { // 200k+	10% INMCoin
+        if (_amount > 76923*1e18) { // 200k+	10% INMCoin
             return 10;
-        } else if (_amount > 23809*1e18) { // 50k - 200k	7% INMCoin
+        } else if (_amount > 19230*1e18) { // 50k - 200k	7% INMCoin
             return 7;
-        } else if (_amount > 9523*1e18) { // 20k - 50k	5% INMCoin
+        } else if (_amount > 7692*1e18) { // 20k - 50k	5% INMCoin
             return 5;
-        } else if (_amount > 2380*1e18) { // 5k - 20k	3% INMCoin
+        } else if (_amount > 1923*1e18) { // 5k - 20k	3% INMCoin
             return 3;
         } else {
             return 0;
