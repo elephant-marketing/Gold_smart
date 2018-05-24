@@ -160,5 +160,5 @@ contract TokenERC20 is Ownable {
 }
 
 contract Token is TokenERC20 {
-    constructor() public TokenERC20(100000000, "SomeCrowdsaleToken", "SCT") {}
+    constructor() public TokenERC20(100000000, "Innovative Minerals", "INM") {}
 }
