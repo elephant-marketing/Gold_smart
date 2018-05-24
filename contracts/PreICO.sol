@@ -54,16 +54,16 @@ contract Ownable {
  * @title CrowdSale
  * @dev https://github.com/
  */
-contract SuperSafeSale is Ownable {
+contract PreICOSale is Ownable {
 
     ERC20 public token;
 
     using SafeMath for uint;
 
     address public backEndOperator = msg.sender;
-    address team = 0x7eDE8260e573d3A3dDfc058f19309DF5a1f7397E; // 33% - основантели проекта
+    address team = 0x7eDE8260e573d3A3dDfc058f19309DF5a1f7397E; // 33% - team и ранние инвесторы проекта
     address bounty = 0x0cdb839B52404d49417C8Ded6c3E2157A06CdD37; // 2% - для баунти программы
-    address reserve = 0xC032D3fCA001b73e8cC3be0B75772329395caA49; // 5%
+    address reserve = 0xC032D3fCA001b73e8cC3be0B75772329395caA49; // 5%  - для резерва
 
     mapping(address=>bool) public whitelist;
 
@@ -108,16 +108,6 @@ contract SuperSafeSale is Ownable {
     // изменение даты окончания предварительной распродажи
     function setEndPreSale(uint256 newEndPreSale) public onlyOwner {
         endPreSale = newEndPreSale;
-    }
-
-    // изменение даты начала основной распродажи
-    function setStartSale(uint256 newStartSale) public onlyOwner {
-        startPreSale = newStartSale;
-    }
-
-    // изменение даты окончания основной распродажи
-    function setEndSale(uint256 newEndSaled) public onlyOwner {
-        endPreSale = newEndSaled;
     }
 
     // Изменение адреса оператора бекэнда
@@ -176,7 +166,7 @@ contract SuperSafeSale is Ownable {
     // выпуск токенов в период предварительной распродажи
     function preSale(address _investor, uint256 _value) internal {
         uint256 tokens = _value.mul(1e18).div(buyPrice);
-        uint256 tokensByDate = tokens.mul(15);
+        uint256 tokensByDate = tokens.mul(15).div(100);
         uint256 bonusSumTokens = tokens.mul(bonusSum(tokens)).div(100);
         tokens = tokens.add(tokensByDate).add(bonusSumTokens); // 60%
         token.mintFromICO(_investor, tokens);
