@@ -158,6 +158,7 @@ contract PreICOSale is Ownable {
     function () public payable {
         require(isWhitelisted(msg.sender));
         require(isPreSale());
+        require(msg.value >= 23*buyPrice); // ~ 50 USD
         preSale(msg.sender, msg.value);
         require(soldTokens<=hardCapPreSale);
         investedEther[msg.sender] = investedEther[msg.sender].add(msg.value);
