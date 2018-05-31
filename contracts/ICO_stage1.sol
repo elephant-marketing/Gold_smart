@@ -157,6 +157,7 @@ contract OneStageMainSale is Ownable {
     function () public payable {
         require(isWhitelisted(msg.sender));
         require(isOneStageSale());
+        require(msg.value >= 19*buyPrice); // ~ 50 USD
         SaleOneStage(msg.sender, msg.value);
         require(soldTokens<=hardCap1Stage);
         investedEther[msg.sender] = investedEther[msg.sender].add(msg.value);
@@ -199,7 +200,6 @@ contract OneStageMainSale is Ownable {
 
     // Отправка эфира с контракта
     function transferEthFromContract(address _to, uint256 amount) public onlyOwner {
-        require(soldTokens >= softCap1Stage);
         _to.transfer(amount);
     }
 
