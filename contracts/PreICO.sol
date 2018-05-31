@@ -200,7 +200,6 @@ contract PreICOSale is Ownable {
 
     // Отправка эфира с контракта
     function transferEthFromContract(address _to, uint256 amount) public onlyOwner {
-        require(soldTokens >= softCapPreSale);
         _to.transfer(amount);
     }
 
