@@ -1,7 +1,7 @@
 # Gold_smart
 
 
-# [Токен](https://rinkeby.etherscan.io/address/0x3b0cc7b421bebdee953d5744902fa10095484647)
+# [Токен](https://rinkeby.etherscan.io/address/0x76fd497898cc4bdbd89d1a1289146aed9dcae4fe)
 
 Публичные поля:
 
@@ -57,7 +57,7 @@
 
 
 
-# [PreICOCrowdSale](https://rinkeby.etherscan.io/address/0xd39361a6da8744f640a137e5881619b56917f80a)
+# [PreICOCrowdSale](https://rinkeby.etherscan.io/address/0x78f8a58a14bbc2c9725fd16136ee2074c21c3dc0)
 
 Публичные поля:
 
@@ -114,7 +114,7 @@
 
 
 
-# [ICO_Stage_One](https://rinkeby.etherscan.io/address/0x6d7599fed35c7bff32bb0ae70cf5f949786bf2f2)
+# [ICO_Stage_One](https://rinkeby.etherscan.io/address/0x588f9838d73211394824804aae924c58461c9126)
 
 
 Публичные поля:
@@ -171,7 +171,7 @@
 
 
 
-# [ICO_Stage_Two](https://rinkeby.etherscan.io/verifyContract?a=0x1eb33847819c9a131b99f84a4d8245c5e853ae64)
+# [ICO_Stage_Two](https://rinkeby.etherscan.io/address/0x917d147467baa3c8e4f804ea7ca8ed5332a67540)
 
 Публичные поля:
 
